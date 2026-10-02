@@ -74,6 +74,14 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSubmit, isSu
       selectedSession,
       customQuestion: '',
     });
+
+    // 신청서 제출 후 모든 입력 항목 초기화
+    setName('');
+    setEmail('');
+    setPhone('');
+    setRecentBook('');
+    setReadingGoal('');
+    setSelectedSessionId(SEMINAR_SESSIONS[0].id);
   };
 
   return (
