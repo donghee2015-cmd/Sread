@@ -87,9 +87,19 @@ export const GoogleSheetsGuideModal: React.FC<GoogleSheetsGuideModalProps> = ({
     onShowToast('success', '코드 복사 완료', 'Apps Script 코드가 클립보드에 복사되었습니다.');
   };
 
-  const handleSave = () => {
-    onSaveSheetUrl(sheetUrl);
-    onShowToast('success', '저장 완료', '구글 스프레드시트 웹 앱 URL이 설정되었습니다.');
+  const handleSave = async () => {
+    const cleanUrl = sheetUrl.trim();
+    onSaveSheetUrl(cleanUrl);
+    try {
+      await fetch('/api/config/sheet-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheetUrl: cleanUrl }),
+      });
+    } catch (e) {
+      console.warn('Failed to save sheet url to server:', e);
+    }
+    onShowToast('success', '저장 완료', '구글 스프레드시트 웹 앱 URL이 서버 및 브라우저에 안전하게 저장되었습니다.');
   };
 
   const handleTestConnection = async () => {
@@ -100,12 +110,22 @@ export const GoogleSheetsGuideModal: React.FC<GoogleSheetsGuideModalProps> = ({
 
     setIsTesting(true);
     try {
+      const cleanUrl = sheetUrl.trim();
+      // First save to server
+      try {
+        await fetch('/api/config/sheet-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sheetUrl: cleanUrl }),
+        });
+      } catch {}
+
       const testPayload = {
         id: `TEST-${Math.floor(Math.random() * 9000 + 1000)}`,
         name: '구글시트 테스트 참가자',
         email: 'test@example.com',
         phone: '010-0000-0000',
-        jobOrField: '연동 테스트',
+        jobOrField: '',
         selectedSessionTitle: '구글 시트 연결 검증 테스트',
         recentBook: '스마트 독서 가이드',
         readingGoal: '구글 스프레드시트와 정상 연동되었는지 확인하는 테스트 행입니다.',
@@ -116,9 +136,9 @@ export const GoogleSheetsGuideModal: React.FC<GoogleSheetsGuideModalProps> = ({
         },
       };
 
-      const res = await submitToGoogleSheet(sheetUrl.trim(), testPayload);
+      const res = await submitToGoogleSheet(cleanUrl, testPayload);
       if (res.success) {
-        onSaveSheetUrl(sheetUrl.trim());
+        onSaveSheetUrl(cleanUrl);
         onShowToast(
           'success',
           '구글 시트 연동 성공!',
@@ -146,15 +166,15 @@ export const GoogleSheetsGuideModal: React.FC<GoogleSheetsGuideModalProps> = ({
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold mb-1">
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>100% 무료 무제한 데이터 저장소</span>
+          <div className="flex items-center gap-2 text-amber-300 text-xs font-bold mb-1">
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <span>⚙️ 개발자 / 관리자 전용 제어판</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-            구글 스프레드시트(Google Sheets) 연동 가이드
+            구글 스프레드시트(Google Sheets) 연동 관리
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-1">
-            복잡한 유료 데이터베이스 대신, 구글 시트의 무료 Apps Script를 통해 신청자 명단을 엑셀처럼 실시간 관리하세요.
+            일반 신청자에게는 보이지 않는 관리자 설정입니다. 웹 앱 URL을 등록하면 참가자 접수 내역이 실시간으로 구글 시트에 자동 기록됩니다.
           </p>
         </div>
 

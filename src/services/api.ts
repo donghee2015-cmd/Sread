@@ -54,20 +54,13 @@ export async function submitToGoogleSheet(
   webhookUrl: string,
   submission: any
 ): Promise<{ success: boolean; message: string }> {
-  if (!webhookUrl) {
-    return {
-      success: false,
-      message: '등록된 구글 시트 웹 앱 URL이 없습니다. (로컬 데이터베이스에만 보관됩니다)',
-    };
-  }
-
-  // 1순위: 서버 프록시를 통해 전송 (CORS 차단 방지)
+  // 1순위: 서버 프록시를 통해 전송 (서버에 저장된 URL 또는 환경변수 자동 적용)
   try {
     const proxyRes = await fetch('/api/submit-sheet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        webhookUrl,
+        webhookUrl: webhookUrl ? webhookUrl.trim() : undefined,
         payload: submission,
       }),
     });
@@ -77,31 +70,44 @@ export async function submitToGoogleSheet(
       if (data.success) {
         return { success: true, message: '구글 스프레드시트에 성공적으로 기록되었습니다!' };
       }
+      if (data.localOnly && !webhookUrl) {
+        return {
+          success: false,
+          message: '구글 스프레드시트 웹 앱 URL이 설정되지 않았습니다.',
+        };
+      }
     }
   } catch (err) {
     console.warn('Server proxy error, attempting direct fetch...', err);
   }
 
-  // 2순위: 브라우저 직접 fetch (no-cors fallback)
-  try {
-    await fetch(webhookUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'text/plain',
-      },
-      body: JSON.stringify(submission),
-    });
-    return {
-      success: true,
-      message: '구글 시트로 신청 정보가 발송되었습니다.',
-    };
-  } catch (error: any) {
-    return {
-      success: false,
-      message: `구글 시트 연동 전송 실패: ${error.message || '네트워크 오류'}`,
-    };
+  // 2순위: 클라이언트에 입력된 webhookUrl이 있으면 브라우저 직접 fetch (no-cors fallback)
+  if (webhookUrl && webhookUrl.trim()) {
+    try {
+      await fetch(webhookUrl.trim(), {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(submission),
+      });
+      return {
+        success: true,
+        message: '구글 시트로 신청 정보가 발송되었습니다.',
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: `구글 시트 연동 전송 실패: ${error.message || '네트워크 오류'}`,
+      };
+    }
   }
+
+  return {
+    success: false,
+    message: '등록된 구글 시트 웹 앱 URL이 없습니다.',
+  };
 }
 
 function getLocalFallbackAnalysis(payload: AnalyzeRequestPayload): AIAnalysisResult {

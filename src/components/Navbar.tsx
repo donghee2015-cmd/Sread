@@ -2,19 +2,14 @@ import React from 'react';
 import { BookOpen, Sparkles, FileSpreadsheet, Search, Rocket, CheckCircle2, FileCode } from 'lucide-react';
 
 interface NavbarProps {
-  activeTab: 'apply' | 'info' | 'lookup' | 'deploy';
-  setActiveTab: (tab: 'apply' | 'info' | 'lookup' | 'deploy') => void;
-  hasSheetConfigured: boolean;
-  onOpenSheetModal: () => void;
-  onOpenCodeViewer: () => void;
+  activeTab: 'apply' | 'info' | 'lookup';
+  setActiveTab: (tab: 'apply' | 'info' | 'lookup') => void;
+  onApplyClick?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
-  hasSheetConfigured,
-  onOpenSheetModal,
-  onOpenCodeViewer,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-white">
@@ -45,18 +40,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Desktop Nav Tabs */}
           <nav className="hidden md:flex items-center gap-1 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/80">
             <button
-              onClick={() => setActiveTab('apply')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                activeTab === 'apply'
-                  ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              참가 신청하기
-            </button>
-            <button
               onClick={() => setActiveTab('info')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
                 activeTab === 'info'
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -66,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('lookup')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ${
                 activeTab === 'lookup'
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -75,64 +60,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Search className="w-3.5 h-3.5" />
               신청 내역 & 티켓 조회
             </button>
-            <button
-              onClick={() => setActiveTab('deploy')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ${
-                activeTab === 'deploy'
-                  ? 'bg-amber-600 text-white shadow-sm shadow-amber-600/30'
-                  : 'text-amber-300 hover:text-amber-200 hover:bg-amber-950/40'
-              }`}
-            >
-              <Rocket className="w-3.5 h-3.5" />
-              초보자 배포 가이드
-            </button>
           </nav>
-
-          {/* Action Tools */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onOpenCodeViewer}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600/90 hover:bg-indigo-600 text-white transition shadow-sm cursor-pointer"
-              title="프로젝트 소스코드 브라우저 뷰어 및 1클릭 복사"
-            >
-              <FileCode className="w-3.5 h-3.5 text-amber-300" />
-              <span>전체 코드 보기</span>
-            </button>
-
-            <button
-              onClick={onOpenSheetModal}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
-                hasSheetConfigured
-                  ? 'bg-emerald-950/60 border-emerald-600/50 text-emerald-300 hover:bg-emerald-900/60'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:border-slate-600 hover:text-white'
-              }`}
-              title="구글 스프레드시트 연동 상태 설정"
-            >
-              <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-              <span className="hidden sm:inline">구글 시트 연동</span>
-              {hasSheetConfigured ? (
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              ) : (
-                <span className="text-[10px] text-amber-400 bg-amber-950/80 px-1 rounded">미연동</span>
-              )}
-            </button>
-          </div>
         </div>
       </div>
 
       {/* Mobile Tab Bar */}
       <div className="md:hidden flex border-t border-slate-800 bg-slate-950 px-2 py-1.5 overflow-x-auto gap-1">
         <button
-          onClick={() => setActiveTab('apply')}
-          className={`flex-1 py-1.5 px-2 rounded text-xs font-semibold text-center whitespace-nowrap ${
-            activeTab === 'apply' ? 'bg-indigo-600 text-white' : 'text-slate-400'
-          }`}
-        >
-          참가 신청
-        </button>
-        <button
           onClick={() => setActiveTab('info')}
-          className={`flex-1 py-1.5 px-2 rounded text-xs font-semibold text-center whitespace-nowrap ${
+          className={`flex-1 py-2 px-2 rounded-lg text-xs font-semibold text-center whitespace-nowrap transition ${
             activeTab === 'info' ? 'bg-indigo-600 text-white' : 'text-slate-400'
           }`}
         >
@@ -140,19 +76,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
         <button
           onClick={() => setActiveTab('lookup')}
-          className={`flex-1 py-1.5 px-2 rounded text-xs font-semibold text-center whitespace-nowrap ${
+          className={`flex-1 py-2 px-2 rounded-lg text-xs font-semibold text-center whitespace-nowrap transition ${
             activeTab === 'lookup' ? 'bg-indigo-600 text-white' : 'text-slate-400'
           }`}
         >
           티켓 조회
-        </button>
-        <button
-          onClick={() => setActiveTab('deploy')}
-          className={`flex-1 py-1.5 px-2 rounded text-xs font-semibold text-center whitespace-nowrap ${
-            activeTab === 'deploy' ? 'bg-amber-600 text-white' : 'text-amber-300'
-          }`}
-        >
-          배포 가이드
         </button>
       </div>
     </header>

@@ -144,11 +144,42 @@ async function startServer() {
     }
   });
 
+  // Google Sheet Webhook URL 지속 보관 (서버 메모리 및 파일)
+  let persistedSheetUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL || '';
+  const SHEET_CONFIG_FILE = path.join(__dirname, '.sheet-config.json');
+  if (fs.existsSync(SHEET_CONFIG_FILE)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(SHEET_CONFIG_FILE, 'utf-8'));
+      if (data.sheetUrl) {
+        persistedSheetUrl = data.sheetUrl;
+      }
+    } catch (e) {
+      console.warn('Failed to read .sheet-config.json:', e);
+    }
+  }
+
+  // Google Sheet URL 조회 API
+  app.get('/api/config/sheet-url', (req: Request, res: Response) => {
+    res.json({ sheetUrl: persistedSheetUrl });
+  });
+
+  // Google Sheet URL 저장 API (개발자/관리자 전용)
+  app.post('/api/config/sheet-url', (req: Request, res: Response) => {
+    const { sheetUrl } = req.body || {};
+    persistedSheetUrl = (sheetUrl || '').trim();
+    try {
+      fs.writeFileSync(SHEET_CONFIG_FILE, JSON.stringify({ sheetUrl: persistedSheetUrl }), 'utf-8');
+    } catch (e) {
+      console.warn('Failed to write .sheet-config.json:', e);
+    }
+    res.json({ success: true, sheetUrl: persistedSheetUrl });
+  });
+
   // API 2: 구글 스프레드시트 Webhook 프록시 (CORS 문제 방지용)
   app.post('/api/submit-sheet', async (req: Request, res: Response) => {
     try {
-      const { webhookUrl, payload } = req.body;
-      const targetUrl = webhookUrl || process.env.GOOGLE_SHEET_WEBHOOK_URL;
+      const { webhookUrl, payload } = req.body || {};
+      const targetUrl = webhookUrl || persistedSheetUrl || process.env.GOOGLE_SHEET_WEBHOOK_URL;
 
       if (!targetUrl) {
         return res.json({
@@ -162,7 +193,7 @@ async function startServer() {
       const response = await fetch(targetUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'text/plain;charset=utf-8',
         },
         body: JSON.stringify(payload),
         redirect: 'follow',

@@ -8,7 +8,7 @@ interface ApplicationFormProps {
     name: string;
     email: string;
     phone: string;
-    jobOrField: string;
+    jobOrField?: string;
     recentBook: string;
     readingGoal: string;
     selectedSession: SeminarSession;
@@ -16,16 +16,6 @@ interface ApplicationFormProps {
   }) => void;
   isSubmitting: boolean;
 }
-
-const JOB_SUGGESTIONS = [
-  '서비스 기획 / PM',
-  '마케팅 / 브랜드',
-  '소프트웨어 개발',
-  '스타트업 대표 / 경영',
-  '디자이너 / 크리에이터',
-  '대학생 / 취업준비생',
-  '교육 / 강사 / 연구',
-];
 
 const BOOK_SUGGESTIONS = [
   '아토믹 해빗 (원자 습관)',
@@ -42,11 +32,9 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSubmit, isSu
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [jobOrField, setJobOrField] = useState('');
   const [recentBook, setRecentBook] = useState('');
   const [readingGoal, setReadingGoal] = useState('');
   const [selectedSessionId, setSelectedSessionId] = useState(SEMINAR_SESSIONS[0].id);
-  const [customQuestion, setCustomQuestion] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   const selectedSession = SEMINAR_SESSIONS.find((s) => s.id === selectedSessionId) || SEMINAR_SESSIONS[0];
@@ -80,11 +68,11 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSubmit, isSu
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
-      jobOrField: jobOrField.trim() || '일반 독서가',
+      jobOrField: '',
       recentBook: recentBook.trim(),
       readingGoal: readingGoal.trim(),
       selectedSession,
-      customQuestion: customQuestion.trim(),
+      customQuestion: '',
     });
   };
 
@@ -259,41 +247,6 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSubmit, isSu
                 </div>
               </div>
             </div>
-
-            {/* 직업 및 관심 분야 */}
-            <div className="mt-4">
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                직업 또는 주 관심 분야
-              </label>
-              <div className="relative mb-2">
-                <Briefcase className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                <input
-                  type="text"
-                  placeholder="예: IT 서비스 기획자, 마케팅, 스타트업 창업가, 대학생 등"
-                  value={jobOrField}
-                  onChange={(e) => setJobOrField(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                />
-              </div>
-
-              <div className="flex flex-wrap gap-1.5 items-center">
-                <span className="text-[11px] text-slate-500">빠른 선택:</span>
-                {JOB_SUGGESTIONS.map((job) => (
-                  <button
-                    key={job}
-                    type="button"
-                    onClick={() => setJobOrField(job)}
-                    className={`text-[11px] px-2.5 py-1 rounded-md transition ${
-                      jobOrField === job
-                        ? 'bg-indigo-600 text-white font-medium'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    {job}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* 3. 독서 경험 및 AI 분석용 정보 */}
@@ -302,7 +255,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSubmit, isSu
               <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 text-xs flex items-center justify-center font-extrabold">
                 3
               </span>
-              독서 이력 및 세미나 참여 고민 (Gemini AI 분석 기준)
+              독서 이력 및 세미나 참여 고민 (Gemini AI 맞춤 진단)
             </label>
 
             {/* 최근 읽은 책 */}
@@ -342,7 +295,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSubmit, isSu
             </div>
 
             {/* 세미나에서 얻고 싶은 점 / 고민 */}
-            <div className="mb-4">
+            <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 이번 세미나에서 얻고 싶은 점 또는 평소 독서/실행 고민 <span className="text-rose-500">*</span>
               </label>
@@ -358,20 +311,6 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSubmit, isSu
                 작성해주신 고민을 바탕으로 Gemini AI가 세미나 당일 연사 및 조원들과 나눌 수 있는 맞춤형 질문지를 준비해드립니다.
               </p>
             </div>
-
-            {/* 사전 질문 (선택) */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                연사 또는 독서 세미나 운영진에게 남기고 싶은 사전 질문 (선택 사항)
-              </label>
-              <input
-                type="text"
-                placeholder="예: 책을 고를 때 비즈니스 서적과 고전의 균형을 맞추는 저자만의 팁이 있나요?"
-                value={customQuestion}
-                onChange={(e) => setCustomQuestion(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-              />
-            </div>
           </div>
 
           {/* 제출 버튼 및 실시간 처리 안내 */}
@@ -379,17 +318,17 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({ onSubmit, isSu
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 px-6 rounded-xl font-bold text-base text-white bg-gradient-to-r from-indigo-600 via-indigo-700 to-indigo-800 hover:from-indigo-700 hover:to-indigo-800 shadow-xl shadow-indigo-600/30 transform active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full py-4 px-6 rounded-xl font-bold text-base text-white bg-indigo-600 hover:bg-indigo-500 shadow-xl shadow-indigo-600/30 transform active:scale-[0.99] transition duration-200 flex items-center justify-center gap-2.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSubmitting ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>AI 독서 성향 정밀 분석 및 구글 시트 등록 중...</span>
+                  <span>참가 신청 및 AI 분석 진행 중...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
-                  <span>참가 신청 완료 & Gemini AI 맞춤 가이드 생성하기</span>
+                  <Sparkles className="w-5 h-5 text-amber-300" />
+                  <span>신청서 작성 완료 및 제출</span>
                 </>
               )}
             </button>

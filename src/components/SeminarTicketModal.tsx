@@ -126,10 +126,12 @@ export const SeminarTicketModal: React.FC<SeminarTicketModalProps> = ({ applicat
                   온·오프라인 하이브리드 (행사 1일 전 문자 및 이메일로 줌 링크 발송)
                 </span>
               </div>
-              <div>
-                <span className="text-slate-500 block text-xs">참가자 관심 분야</span>
-                <span className="text-slate-800 block mt-0.5">{application.jobOrField}</span>
-              </div>
+              {application.jobOrField ? (
+                <div>
+                  <span className="text-slate-500 block text-xs">참가자 관심 분야</span>
+                  <span className="text-slate-800 block mt-0.5">{application.jobOrField}</span>
+                </div>
+              ) : null}
             </div>
           </div>
 

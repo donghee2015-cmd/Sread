@@ -54,20 +54,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           접수된 내역은 <span className="text-emerald-300 font-medium">구글 스프레드시트</span>에 실시간으로 안전하게 자동 기록됩니다.
         </p>
 
-        {/* CTA Buttons */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        {/* Single CTA Button */}
+        <div className="mt-8 flex items-center justify-center">
           <button
             onClick={onApplyClick}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 transition flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-10 py-4 rounded-xl font-bold text-base bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/30 transform hover:-translate-y-0.5 active:scale-[0.98] transition flex items-center justify-center gap-2.5 cursor-pointer"
           >
-            <span>지금 무료 참가 신청하기</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-          <button
-            onClick={onExploreInfo}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold text-sm bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 hover:text-white transition flex items-center justify-center gap-2"
-          >
-            <span>세션 커리큘럼 & 연사 둘러보기</span>
+            <span>참가 신청하기</span>
+            <ArrowRight className="w-5 h-5" />
           </button>
         </div>
 
