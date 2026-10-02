@@ -1,0 +1,6 @@
+{
+  "name": "스마트 독서 세미나 참가 신청 & 자동 안내 센터",
+  "description": "구글 스프레드시트 연동 및 Gemini AI 맞춤 독서 성향 분석을 지원하는 스마트 독서 세미나 접수/안내 포털",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
